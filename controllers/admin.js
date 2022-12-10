@@ -1,5 +1,6 @@
 const { validationResult } = require("express-validator");
 const Listing = require("../models/listing");
+const services = require("../Services/admin");
 
 exports.getJobs = (req, res, next) => {
   Listing.findAll()
@@ -12,43 +13,20 @@ exports.getJobs = (req, res, next) => {
 };
 
 exports.postJob = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    const error = new Error("Validation failed, entered data is incorrect.");
-    error.statusCode = 422;
-    throw error;
-  }
-  const clientFirstName = req.body.clientFirstName;
-  const clientLastName = req.body.clientLastName;
-  const clientCompany = req.body.clientCompany;
-  const clientEmail = req.body.clientEmail;
-  const jobTitle = req.body.jobTitle;
-  const jobDetails = req.body.jobDetails;
-  const completionDate = req.body.completionDate;
-  const feeAmount = req.body.feeAmount;
-  Listing.create({
-    clientFirstName: clientFirstName,
-    clientLastName: clientLastName,
-    clientCompany: clientCompany,
-    clientEmail: clientEmail,
-    jobTitle: jobTitle,
-    jobDetails: jobDetails,
-    completionDate: completionDate,
-    feeAmount: feeAmount,
-  })
-    .then((result) => {
-      console.log(result);
-      res.status(201).json({
-        message: "job created successfully",
-        post: result,
-      });
-    })
-    .catch((err) => {
-      if (!err.statusCode) {
-        err.statusCode = 500;
-      }
-      next(err);
-    });
+    services.postJob(req)
+      .then((result) => {
+          console.log(result);
+          res.status(201).json({
+            message: "job created successfully",
+            post: result,
+          });
+        })
+        .catch((err) => {
+          if (!err.statusCode) {
+            err.statusCode = 500;
+          }
+          next(err);
+        });
 };
 
 exports.getjob = () => {
